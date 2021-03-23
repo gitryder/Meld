@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-val meld_red = Color(0xFFE30425)
+val meld_red = Color(0xFFEE1C3B)
 val meld_white = Color.White
 val meld_purple_700 = Color(0xFF7B1A67)
 val meld_purple_800 = Color(0xFF5D1049)
@@ -22,10 +22,10 @@ val meldColors = lightColors(
 )
 
 val CardShape = RoundedCornerShape(
-    topStart = 10.dp,
+    topStart = 15.dp,
     topEnd = 0.dp,
     bottomStart = 0.dp,
-    bottomEnd = 10.dp
+    bottomEnd = 15.dp
 )
 
 @Composable

@@ -1,25 +1,28 @@
-package com.realllydan.meld
+package com.realllydan.meld.home
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
-import androidx.annotation.VisibleForTesting
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cached
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import com.realllydan.meld.CardShape
+import com.realllydan.meld.MeldTheme
+import com.realllydan.meld.data.PassPhrase
+
+private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,12 +48,16 @@ class MainActivity : AppCompatActivity() {
 //                            .width(50.dp)
 //                    )
 
+                    var passphrase: String by remember { mutableStateOf(
+                        PassPhrase().getPassphrase(this@MainActivity).toString()
+                    )}
+
                     Card (
                         shape = CardShape,
                         backgroundColor = MaterialTheme.colors.primaryVariant
                     ) {
                         Text(
-                            text = "correct horse battery staple quasi stream scant",
+                            text = passphrase,
                             color = MaterialTheme.colors.onSurface,
                             fontSize = 36.sp,
                             modifier = Modifier.padding(16.dp)
@@ -60,7 +67,9 @@ class MainActivity : AppCompatActivity() {
                     Spacer( modifier = Modifier.padding(top = 16.dp) )
 
                     FloatingActionButton(
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                            passphrase = PassPhrase().getPassphrase(this@MainActivity).toString()
+                        },
                         modifier = Modifier
                             .align(Alignment.End)
                             .size(58.dp)
