@@ -2,13 +2,11 @@ package com.realllydan.meld.home
 
 import android.content.ClipData
 import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cached
@@ -16,14 +14,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.realllydan.meld.CardShape
 import com.realllydan.meld.MeldTheme
 import com.realllydan.meld.composables.PassphraseCard
 import com.realllydan.meld.data.PassPhrase
-import kotlinx.coroutines.launch
 
 private const val TAG = "MainActivity"
 
@@ -35,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             MeldTheme {
-                BottomSheetScaffold (
+                BottomSheetScaffold(
                     sheetContent = {
                         Box(
                             Modifier
@@ -70,7 +65,7 @@ class MainActivity : AppCompatActivity() {
                                 PassPhrase().getPassphrase(this@MainActivity).toString()
                             )
                         }
-                        
+
                         PassphraseCard(
                             text = passphrase,
                             onClick = {
@@ -103,8 +98,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun copyTextToClipboard(text: String) {
-        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+    private fun copyTextToClipboard(text: String) {
+        val clipboard =
+            getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
         val clip = ClipData.newPlainText("Passphrase", text)
         clipboard.setPrimaryClip(clip)
     }

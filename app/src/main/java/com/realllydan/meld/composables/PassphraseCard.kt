@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.sp
 import com.realllydan.meld.CardShape
 
 @Composable
-fun PassphraseCard(
+fun PassphraseCard (
     text: String,
     onClick: (() -> Unit)? = null
 ) {
