@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.realllydan.meld.MeldTheme
 import com.realllydan.meld.composables.PassphraseCard
+import com.realllydan.meld.data.Hash
 import com.realllydan.meld.data.PassPhrase
 
 private const val TAG = "MainActivity"
@@ -66,8 +67,17 @@ class MainActivity : AppCompatActivity() {
                             )
                         }
 
-                        PassphraseCard(
+                        PassphraseCard (
                             text = passphrase,
+                            onClick = {
+                                copyTextToClipboard(passphrase)
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.padding(top = 16.dp))
+
+                        PassphraseCard (
+                            text = Hash().getHashFromText(passphrase),
                             onClick = {
                                 copyTextToClipboard(passphrase)
                             }
