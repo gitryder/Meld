@@ -1,30 +1,31 @@
 package com.realllydan.meld.home
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.ClipData
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cached
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import com.realllydan.meld.CardShape
 import com.realllydan.meld.MeldTheme
+import com.realllydan.meld.composables.MeldCard
+import com.realllydan.meld.data.Hash
 import com.realllydan.meld.data.PassPhrase
 
 private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
+
+    @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -39,36 +40,34 @@ class MainActivity : AppCompatActivity() {
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
 
-                ) {
-//                    Image (
-//                        painter = painterResource(id = R.drawable.meld_logo),
-//                        "Meld App logo",
-//                        modifier = Modifier
-//                            .height(50.dp)
-//                            .width(50.dp)
-//                    )
-
-                    var passphrase: String by remember { mutableStateOf(
-                        PassPhrase().getPassphrase(this@MainActivity).toString()
-                    )}
-
-                    Card (
-                        shape = CardShape,
-                        backgroundColor = MaterialTheme.colors.primaryVariant
                     ) {
-                        Text(
-                            text = passphrase,
-                            color = MaterialTheme.colors.onSurface,
-                            fontSize = 36.sp,
-                            modifier = Modifier.padding(16.dp)
+                    var passphrase: String by remember {
+                        mutableStateOf(
+                            PassPhrase().getPassphrase(this@MainActivity).toString()
                         )
                     }
 
-                    Spacer( modifier = Modifier.padding(top = 16.dp) )
+                    MeldCard (
+                        text = passphrase,
+                        color = Color(0xFF5F6466),
+                    ) {
+                        copyTextToClipboard(passphrase)
+                    }
+
+                    Spacer(modifier = Modifier.padding(top = 16.dp))
+
+                    MeldCard (
+                        text = Hash().getHashFromText(passphrase),
+                    ) {
+                        copyTextToClipboard(passphrase)
+                    }
+
+                    Spacer(modifier = Modifier.padding(top = 16.dp))
 
                     FloatingActionButton(
                         onClick = {
-                            passphrase = PassPhrase().getPassphrase(this@MainActivity).toString()
+                            passphrase =
+                                PassPhrase().getPassphrase(this@MainActivity).toString()
                         },
                         modifier = Modifier
                             .align(Alignment.End)
@@ -82,8 +81,14 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
                 }
-
             }
         }
+    }
+
+    private fun copyTextToClipboard(text: String) {
+        val clipboard =
+            getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+        val clip = ClipData.newPlainText("Passphrase", text)
+        clipboard.setPrimaryClip(clip)
     }
 }
