@@ -8,18 +8,20 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.realllydan.meld.CardShape
 
 @Composable
-fun PassphraseCard (
+fun MeldCard (
     text: String,
+    color: Color = MaterialTheme.colors.primaryVariant,
     onClick: (() -> Unit)? = null
 ) {
     Card(
         shape = CardShape,
-        backgroundColor = MaterialTheme.colors.primaryVariant,
+        backgroundColor = color,
         modifier = Modifier
             .clickable {
                 onClick?.invoke()
@@ -28,7 +30,7 @@ fun PassphraseCard (
         Text(
             text = text,
             color = MaterialTheme.colors.onSurface,
-            fontSize = 36.sp,
+            fontSize = 30.sp,
             modifier = Modifier
                 .padding(16.dp)
         )
