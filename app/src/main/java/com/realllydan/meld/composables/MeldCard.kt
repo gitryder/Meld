@@ -30,7 +30,7 @@ fun MeldCard (
         Text(
             text = text,
             color = MaterialTheme.colors.onSurface,
-            fontSize = 30.sp,
+            fontSize = 32.sp,
             modifier = Modifier
                 .padding(16.dp)
         )
