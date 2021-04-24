@@ -7,7 +7,9 @@ class Dice{
             (a*10+(1..6).random()).also { a = it }
         }
         return a
+
     }
+
 }
 fun main(){
     val d = Dice()

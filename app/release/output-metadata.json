@@ -10,6 +10,10 @@
     {
       "type": "SINGLE",
       "filters": [],
+<<<<<<< HEAD
+=======
+      "attributes": [],
+>>>>>>> feature/passphrase-hash-card
       "versionCode": 1,
       "versionName": "1.0",
       "outputFile": "app-release.apk"
