@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -29,7 +30,6 @@ import com.realllydan.meld.data.*
 private const val TAG = "MainActivity"
 
 lateinit var passphraseDao: PassphraseDao
-lateinit var passphraseList: List<Passphrase>
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,9 +43,13 @@ class MainActivity : AppCompatActivity() {
         ).allowMainThreadQueries().build()
 
         passphraseDao = db.passphraseDao()
-        passphraseList = passphraseDao.getAll()
+
 
         setContent {
+            var passphraseList: List<Passphrase> by remember { mutableStateOf(
+                passphraseDao.getAll()
+            )}
+
             MeldTheme {
                 BottomSheetScaffold(
                     sheetBackgroundColor = MaterialTheme.colors.primary,
@@ -81,10 +85,15 @@ class MainActivity : AppCompatActivity() {
                                 verticalArrangement = Arrangement.spacedBy(16.dp),
                                 contentPadding = PaddingValues(all = 16.dp)
                             ) {
-                                itemsIndexed(
+                                items(
                                     items = passphraseList
-                                ) { _, Passphrase ->
-                                    MeldCard(text = Passphrase.passphrase)
+                                ) { Passphrase ->
+                                    MeldCard(
+                                        text = Passphrase.passphrase,
+                                        color = Color(0xFF5F6466)
+                                    ) {
+                                        copyTextToClipboard(Passphrase.passphrase)
+                                    }
                                 }
                             }
                         }
@@ -109,17 +118,19 @@ class MainActivity : AppCompatActivity() {
                         MeldCard (
                             text = passphrase,
                             color = Color(0xFF5F6466),
-                        ) {
-                            copyTextToClipboard(passphrase)
-                        }
+                            onClick = {
+                                copyTextToClipboard(passphrase)
+                            }
+                        )
 
                         Spacer(modifier = Modifier.padding(top = 16.dp))
 
                         MeldCard (
                             text = Hash().getHashFromText(passphrase),
-                        ) {
-                            copyTextToClipboard(passphrase)
-                        }
+                            onClick = {
+                                copyTextToClipboard(passphrase)
+                            }
+                        )
 
                         Spacer(modifier = Modifier.padding(top = 16.dp))
 
@@ -129,6 +140,7 @@ class MainActivity : AppCompatActivity() {
                             FloatingActionButton(
                                 onClick = {
                                     persistPassphraseToRoom(passphrase)
+                                    passphraseList = passphraseDao.getAll()
                                 },
                                 modifier = Modifier
                                     .padding(end = 8.dp)
@@ -173,10 +185,11 @@ class MainActivity : AppCompatActivity() {
         passphraseDao.insert(passphrase)
     }
 
-    private fun copyTextToClipboard(text: String) {
+    private fun copyTextToClipboard(textToCopy: String) {
         val clipboard =
             getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-        val clip = ClipData.newPlainText("Passphrase", text)
+        val clip = ClipData.newPlainText("Passphrase", textToCopy)
         clipboard.setPrimaryClip(clip)
     }
+
 }

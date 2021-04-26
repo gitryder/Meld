@@ -17,7 +17,8 @@ import com.realllydan.meld.CardShape
 fun MeldCard (
     text: String,
     color: Color = MaterialTheme.colors.primaryVariant,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null
 ) {
     Card(
         shape = CardShape,
