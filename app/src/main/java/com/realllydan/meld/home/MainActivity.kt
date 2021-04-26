@@ -7,21 +7,29 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cached
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.room.Room
 import com.realllydan.meld.MeldTheme
 import com.realllydan.meld.composables.MeldCard
-import com.realllydan.meld.data.Hash
-import com.realllydan.meld.data.PassPhrase
+import com.realllydan.meld.data.*
 
 private const val TAG = "MainActivity"
+
+lateinit var passphraseDao: PassphraseDao
+lateinit var passphraseList: List<Passphrase>
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,60 +37,140 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val db = Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java, "passphrases"
+        ).allowMainThreadQueries().build()
+
+        passphraseDao = db.passphraseDao()
+        passphraseList = passphraseDao.getAll()
+
         setContent {
             MeldTheme {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .background(color = MaterialTheme.colors.primary)
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                BottomSheetScaffold(
+                    sheetBackgroundColor = MaterialTheme.colors.primary,
+                    sheetContent = {
+                        Column(
+                            Modifier
+                                .fillMaxSize()
+                        ) {
+                            Icon(
+                                Icons.Filled.ExpandLess,
+                                "Expand bottom sheet",
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .size(48.dp)
+                            )
 
-                    ) {
-                    var passphrase: String by remember {
-                        mutableStateOf(
-                            PassPhrase().getPassphrase(this@MainActivity).toString()
-                        )
-                    }
+                            Text(
+                                text = "Previously",
+                                color = MaterialTheme.colors.onSurface,
+                                fontSize = 40.sp,
+                                modifier = Modifier.padding(
+                                    start = 16.dp,
+                                    top = 32.dp,
+                                    end = 16.dp,
+                                    bottom = 8.dp
+                                )
+                            )
 
-                    MeldCard (
-                        text = passphrase,
-                        color = Color(0xFF5F6466),
-                    ) {
-                        copyTextToClipboard(passphrase)
-                    }
+                            Spacer(modifier = Modifier.padding(top = 16.dp))
 
-                    Spacer(modifier = Modifier.padding(top = 16.dp))
-
-                    MeldCard (
-                        text = Hash().getHashFromText(passphrase),
-                    ) {
-                        copyTextToClipboard(passphrase)
-                    }
-
-                    Spacer(modifier = Modifier.padding(top = 16.dp))
-
-                    FloatingActionButton(
-                        onClick = {
-                            passphrase =
-                                PassPhrase().getPassphrase(this@MainActivity).toString()
-                        },
+                            LazyColumn(
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                                contentPadding = PaddingValues(all = 16.dp)
+                            ) {
+                                itemsIndexed(
+                                    items = passphraseList
+                                ) { _, Passphrase ->
+                                    MeldCard(text = Passphrase.passphrase)
+                                }
+                            }
+                        }
+                    }, sheetPeekHeight = 55.dp
+                ) {
+                    Column(
                         modifier = Modifier
-                            .align(Alignment.End)
-                            .size(58.dp)
-                    ) {
-                        Icon(
-                            Icons.Filled.Cached,
-                            "Generate New Passphrase",
-                            tint = Color.White,
-                            modifier = Modifier.size(38.dp)
-                        )
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .background(color = MaterialTheme.colors.primary)
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+
+                        ) {
+                        var passphrase: String by remember {
+                            mutableStateOf(
+                                PassphraseGenerator().getPassphrase(this@MainActivity).toString()
+                            )
+                        }
+
+                        MeldCard (
+                            text = passphrase,
+                            color = Color(0xFF5F6466),
+                        ) {
+                            copyTextToClipboard(passphrase)
+                        }
+
+                        Spacer(modifier = Modifier.padding(top = 16.dp))
+
+                        MeldCard (
+                            text = Hash().getHashFromText(passphrase),
+                        ) {
+                            copyTextToClipboard(passphrase)
+                        }
+
+                        Spacer(modifier = Modifier.padding(top = 16.dp))
+
+                        Row(
+                            modifier = Modifier.align(Alignment.End)
+                        ){
+                            FloatingActionButton(
+                                onClick = {
+                                    persistPassphraseToRoom(passphrase)
+                                },
+                                modifier = Modifier
+                                    .padding(end = 8.dp)
+                                    .size(56.dp),
+                                backgroundColor = Color(0xFF11C21F)
+                            ) {
+                                Icon(
+                                    Icons.Filled.Save,
+                                    "Save passphrase to device",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.padding(top = 16.dp))
+
+                            FloatingActionButton(
+                                onClick = {
+                                    passphrase =
+                                        PassphraseGenerator().getPassphrase(this@MainActivity).toString()
+                                },
+                                modifier = Modifier
+                                    .size(56.dp),
+                                backgroundColor = Color(0xFF09A2F8)
+                            ) {
+                                Icon(
+                                    Icons.Filled.Cached,
+                                    "Generate New Passphrase",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(36.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
+    }
+
+    private fun persistPassphraseToRoom(passphraseToSave: String) {
+        val passphrase = Passphrase(passphrase = passphraseToSave)
+        passphraseDao.insert(passphrase)
     }
 
     private fun copyTextToClipboard(text: String) {
